@@ -332,6 +332,111 @@ async function convertFigmaJsonToNodes(
  */
 async function processFigmaNode(node: FigmaJsonNode): Promise<SceneNode> {
   let figmaNode: SceneNode;
+  
+  // Handle HTML element types from browser-extract.js
+  const nodeType = (node.type || '').toUpperCase();
+  const isHtmlType = !['FRAME', 'RECTANGLE', 'TEXT', 'IMAGE', 'GROUP', 'COMPONENT'].includes(nodeType);
+  
+  if (isHtmlType) {
+    // This is HTML-derived JSON, convert it properly
+    const htmlNode: any = node;
+    
+    // Handle text nodes
+    if (htmlNode.text || nodeType === 'TEXT') {
+      figmaNode = figma.createText();
+      const textContent = htmlNode.text || '';
+      
+      if (textContent) {
+        const fontFamily = htmlNode.styles?.fontFamily ? sanitizeFontFamily(htmlNode.styles.fontFamily) : 'Inter';
+        const fontWeight = htmlNode.styles?.fontWeight;
+        const fontStyle = mapFontWeightToStyle(fontWeight);
+        
+        const appliedFont = await loadFontWithFallback(fontFamily, fontStyle);
+        (figmaNode as TextNode).fontName = appliedFont;
+        (figmaNode as TextNode).characters = textContent;
+        
+        // Apply text styles
+        if (htmlNode.styles?.fontSize) {
+          (figmaNode as TextNode).fontSize = parseDimension(htmlNode.styles.fontSize, 16);
+        }
+        if (htmlNode.styles?.color) {
+          (figmaNode as TextNode).fills = [{
+            type: 'SOLID',
+            color: parseColor(htmlNode.styles.color)
+          }];
+        }
+        if (htmlNode.styles?.textAlign) {
+          const align = htmlNode.styles.textAlign;
+          if (align === 'center') (figmaNode as TextNode).textAlignHorizontal = 'CENTER';
+          else if (align === 'right') (figmaNode as TextNode).textAlignHorizontal = 'RIGHT';
+          else if (align === 'justify') (figmaNode as TextNode).textAlignHorizontal = 'JUSTIFIED';
+        }
+      }
+    } 
+    // Handle image nodes
+    else if (nodeType === 'IMG') {
+      figmaNode = figma.createRectangle();
+      (figmaNode as RectangleNode).fills = [{
+        type: 'SOLID',
+        color: { r: 0.85, g: 0.85, b: 0.85 }
+      }];
+      (figmaNode as RectangleNode).strokes = [{
+        type: 'SOLID',
+        color: { r: 0.7, g: 0.7, b: 0.7 }
+      }];
+      (figmaNode as RectangleNode).strokeWeight = 1;
+    }
+    // Handle everything else as frames
+    else {
+      figmaNode = figma.createFrame();
+      
+      // Apply background color
+      if (htmlNode.styles?.backgroundColor) {
+        const bgColor = htmlNode.styles.backgroundColor;
+        if (bgColor && bgColor !== 'transparent' && bgColor !== 'rgba(0,0,0,0)') {
+          (figmaNode as FrameNode).fills = [{
+            type: 'SOLID',
+            color: parseColor(bgColor)
+          }];
+        } else {
+          (figmaNode as FrameNode).fills = [];
+        }
+      } else {
+        (figmaNode as FrameNode).fills = [];
+      }
+      
+      // Apply borders
+      if (htmlNode.styles) {
+        applyBorderStyles(figmaNode, htmlNode.styles);
+        applyShadowStyles(figmaNode, htmlNode.styles);
+      }
+      
+      // Apply Auto Layout if flexbox
+      if (htmlNode.styles?.display === 'flex' || htmlNode.styles?.display === 'inline-flex') {
+        const frame = figmaNode as FrameNode;
+        frame.layoutMode = htmlNode.styles.flexDirection === 'column' ? 'VERTICAL' : 'HORIZONTAL';
+        
+        const gap = parseDimension(htmlNode.styles.gap || htmlNode.styles.gridGap, 0);
+        if (gap > 0) frame.itemSpacing = gap;
+        
+        const justifyContent = htmlNode.styles.justifyContent;
+        if (justifyContent === 'center') frame.primaryAxisAlignItems = 'CENTER';
+        else if (justifyContent === 'flex-end' || justifyContent === 'end') frame.primaryAxisAlignItems = 'MAX';
+        else if (justifyContent === 'space-between') frame.primaryAxisAlignItems = 'SPACE_BETWEEN';
+        
+        const alignItems = htmlNode.styles.alignItems;
+        if (alignItems === 'center') frame.counterAxisAlignItems = 'CENTER';
+        else if (alignItems === 'flex-end' || alignItems === 'end') frame.counterAxisAlignItems = 'MAX';
+      }
+    }
+    
+    // Set name from HTML element info
+    const idPart = htmlNode.id ? `#${htmlNode.id}` : '';
+    const classPart = htmlNode.classes?.length > 0 ? `.${htmlNode.classes.join('.')}` : '';
+    figmaNode.name = `${htmlNode.type || 'div'}${idPart}${classPart}`;
+    
+  } else {
+    // Standard Figma node types
 
   switch (node.type) {
     case "FRAME":
@@ -452,28 +557,38 @@ async function processFigmaNode(node: FigmaJsonNode): Promise<SceneNode> {
     default:
       figmaNode = figma.createFrame();
   }
-
-  // Common properties
+  
+  // Common properties for standard Figma nodes
   if (node.name) figmaNode.name = node.name;
-
-  // Position - always set, fallback to 0 if missing
-  figmaNode.x = node.x !== undefined ? node.x : 0;
-  figmaNode.y = node.y !== undefined ? node.y : 0;
-
-  // Size - always set, fallback to 100x100 if missing
-  if (figmaNode.type === "TEXT") {
-    // For text nodes, don't resize to avoid clipping with textAutoResize
-    // const w = node.width !== undefined ? node.width : 200;
-    // const h = node.height !== undefined ? node.height : 32;
-    // (figmaNode as TextNode).resize(w, h);
-  } else {
-    const w = node.width !== undefined ? node.width : 100;
-    const h = node.height !== undefined ? node.height : 100;
-    figmaNode.resize(w, h);
   }
 
-  // Background color
-  if (node.backgroundColor && figmaNode.type !== "TEXT") {
+  // Position and size handling (works for both HTML and Figma nodes)
+  // For HTML nodes, check position.absolute first
+  const htmlNode = node as any;
+  if (htmlNode.position?.absolute) {
+    figmaNode.x = parseDimension(htmlNode.position.absolute.x, 0);
+    figmaNode.y = parseDimension(htmlNode.position.absolute.y, 0);
+    
+    if (figmaNode.type !== "TEXT") {
+      const w = parseDimension(htmlNode.position.absolute.width, 100);
+      const h = parseDimension(htmlNode.position.absolute.height, 100);
+      figmaNode.resize(w, h);
+    }
+  } else {
+    // Standard Figma node positioning
+    figmaNode.x = node.x !== undefined ? node.x : 0;
+    figmaNode.y = node.y !== undefined ? node.y : 0;
+
+    // Size - always set, fallback to 100x100 if missing
+    if (figmaNode.type !== "TEXT") {
+      const w = node.width !== undefined ? node.width : 100;
+      const h = node.height !== undefined ? node.height : 100;
+      figmaNode.resize(w, h);
+    }
+  }
+
+  // Background color (for standard Figma nodes only)
+  if (!isHtmlType && node.backgroundColor && figmaNode.type !== "TEXT") {
     const color = parseColor(node.backgroundColor);
     // Darken the color to make it more visible
     color.r = Math.max(0, color.r - 0.3);
@@ -487,8 +602,8 @@ async function processFigmaNode(node: FigmaJsonNode): Promise<SceneNode> {
     ];
   }
 
-  // Fills
-  if (node.fills && figmaNode.type !== "TEXT") {
+  // Fills (for standard Figma nodes only)
+  if (!isHtmlType && node.fills && figmaNode.type !== "TEXT") {
     const fills: Paint[] = [];
     for (const fill of node.fills) {
       if (fill.type === "SOLID" && fill.color) {
