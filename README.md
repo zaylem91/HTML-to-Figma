@@ -1,6 +1,12 @@
 # HTML Whisperer: HTML to Figma Converter
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GitHub stars](https://img.shields.io/github/stars/kbishopzz/HTML-to-Figma?style=social)](https://github.com/kbishopzz/HTML-to-Figma/stargazers)
+[![GitHub issues](https://img.shields.io/github/issues/kbishopzz/HTML-to-Figma)](https://github.com/kbishopzz/HTML-to-Figma/issues)
+
 A powerful Figma plugin that converts websites to editable Figma designs with accurate visual replication. Extract any website and recreate it in Figma with preserved styling, layout, and typography.
+
+> 🎯 **Extract → Convert → Edit** - Turn any website into a Figma design in under 5 minutes!
 
 ## 🚀 Key Features
 
@@ -258,8 +264,32 @@ copy(JSON.stringify(pageToSimpleJson(), null, 2));
 
 Notes:
 
-- This snippet produces a basic frame/text snapshot and is intended as a starting point. For more accurate conversions (styles, nested DOM, images, flex layouts), use a dedicated DOM-to-JSON exporter or adapt the snippet to capture the properties you need.
+- This snippet produces a basic frame/text snapshot and is intended as a starting point. For more accurate conversions (styles, nested DOM, images, flex layouts), use the provided `browser-extract.js` script which captures comprehensive styling and layout information.
 - After copying, paste into the plugin JSON textarea and Convert.
 
-If you'd like, I can add a small `scripts/export-dom.js` helper that runs in a Puppeteer headless session to generate improved JSON for sites (useful for batch processing).
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Built for designers who want to move fast and replicate visually
+- Inspired by the need to bridge the gap between web and design tools
+- Thanks to all contributors and the Figma plugin community
+
+## ⭐ Star Us!
+
+If you find this project useful, please consider giving it a star on GitHub! It helps others discover the project.
+
+[![GitHub stars](https://img.shields.io/github/stars/kbishopzz/HTML-to-Figma?style=social)](https://github.com/kbishopzz/HTML-to-Figma/stargazers)
+
+---
+
+**Made with ❤️ for designers and developers** | [Report Bug](https://github.com/kbishopzz/HTML-to-Figma/issues) | [Request Feature](https://github.com/kbishopzz/HTML-to-Figma/issues)
 ```
