@@ -2,10 +2,41 @@
 *.log
 *.log.*
 node_modules
+package-lock.json
 
+# Build outputs
 out/
 dist/
 code.js
 
 # macOS
 .DS_Store
+
+# IDE
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Optional: Backup files (keep if you want them in git)
+# *-original.*
+# *-backup.*
