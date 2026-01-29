@@ -291,6 +291,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 Transform any website into editable Figma designs • [Report Bug](https://github.com/kbishopzz/HTML-to-Figma/issues) • [Request Feature](https://github.com/kbishopzz/HTML-to-Figma/discussions)
 
 [⬆ Back to top](#html-to-figma---web-page-extractor)
+
 - **Learning Tool**: Study how websites are structured visually
 
 ## 🤝 Contributing

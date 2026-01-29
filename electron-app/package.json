@@ -1,0 +1,71 @@
+{
+  "name": "html-to-figma-server",
+  "version": "1.0.0",
+  "description": "Desktop server for HTML to Figma extraction",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder --mac",
+    "build:mac": "electron-builder --mac --universal",
+    "build:mac-arm": "electron-builder --mac --arm64",
+    "build:mac-intel": "electron-builder --mac --x64",
+    "pack": "electron-builder --dir"
+  },
+  "author": "HTML to Figma",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.1.0",
+    "electron-builder": "^24.9.1"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "puppeteer": "^21.9.0",
+    "cors": "^2.8.5",
+    "electron-store": "^8.1.0"
+  },
+  "build": {
+    "appId": "com.htmltofigma.server",
+    "productName": "HTML to Figma Server",
+    "mac": {
+      "category": "public.app-category.developer-tools",
+      "icon": "assets/icon.icns",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["universal"]
+        },
+        {
+          "target": "zip",
+          "arch": ["universal"]
+        }
+      ],
+      "darkModeSupport": true,
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "entitlements.mac.plist",
+      "entitlementsInherit": "entitlements.mac.plist"
+    },
+    "dmg": {
+      "title": "HTML to Figma Server",
+      "icon": "assets/icon.icns",
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "files": [
+      "**/*",
+      "!**/*.md",
+      "!screenshots/**"
+    ]
+  }
+}

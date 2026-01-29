@@ -14,6 +14,7 @@ First public release of HTML to Figma - Web Page Extractor plugin.
 ### ✨ Added
 
 #### Core Features
+
 - Dual extraction modes: automatic (via local server) and manual (browser console)
 - Automatic URL extraction using Node.js + Express + Puppeteer server
 - Manual extraction via browser console script (`browser-extract.js`)
@@ -24,6 +25,7 @@ First public release of HTML to Figma - Web Page Extractor plugin.
 - Font loading with fallback to Inter
 
 #### Architecture
+
 - Modular codebase with converters and utilities
 - `html-converter.ts` - HTML-style JSON to Figma conversion
 - `figma-converter.ts` - Figma-style JSON to Figma conversion
@@ -33,6 +35,7 @@ First public release of HTML to Figma - Web Page Extractor plugin.
 - `font-utils.ts` - Font loading with fallbacks
 
 #### User Interface
+
 - Three-tab UI: URL Extraction, JSON Input, Options
 - "Paste from Clipboard" button with auto-paste on tab switch
 - Real-time extraction status and error messages
@@ -40,6 +43,7 @@ First public release of HTML to Figma - Web Page Extractor plugin.
 - Comprehensive console logging for debugging
 
 #### Developer Tools
+
 - Automated testing framework (`automated-test.ts`)
 - Visual test validation with node counting
 - Test automation scripts
@@ -47,6 +51,7 @@ First public release of HTML to Figma - Web Page Extractor plugin.
 - TypeScript with full type definitions
 
 #### Documentation
+
 - Complete README with installation and usage guide
 - Architecture documentation
 - Extraction server setup guide
@@ -58,6 +63,7 @@ First public release of HTML to Figma - Web Page Extractor plugin.
 ### 🔧 Technical Details
 
 #### Dependencies
+
 - TypeScript 5.x
 - Webpack 5.99.5
 - Express 4.x
@@ -65,11 +71,13 @@ First public release of HTML to Figma - Web Page Extractor plugin.
 - CORS middleware
 
 #### Build System
+
 - Webpack bundling with TypeScript
 - HTML inlining for plugin UI
 - Development and production builds
 
 #### Network Access
+
 - Configured for localhost:3000 (extraction server)
 - HTTPS support for web requests
 - Proper CORS handling
@@ -77,6 +85,7 @@ First public release of HTML to Figma - Web Page Extractor plugin.
 ### 📋 Format Support
 
 #### HTML-Style JSON
+
 ```json
 {
   "type": "div",
@@ -87,6 +96,7 @@ First public release of HTML to Figma - Web Page Extractor plugin.
 ```
 
 #### Figma-Style JSON
+
 ```json
 {
   "type": "FRAME",
@@ -126,6 +136,7 @@ First public release of HTML to Figma - Web Page Extractor plugin.
 ### [1.1.0] - Planned (Q2 2026)
 
 #### Planned Features
+
 - [ ] Image downloading and embedding
 - [ ] CSS animations to Figma interactions
 - [ ] Component detection and creation
@@ -135,6 +146,7 @@ First public release of HTML to Figma - Web Page Extractor plugin.
 ### [1.2.0] - Planned (Q3 2026)
 
 #### Planned Features
+
 - [ ] Style guide generation
 - [ ] Design token export (JSON/CSS/SCSS)
 - [ ] Responsive breakpoint support
@@ -143,6 +155,7 @@ First public release of HTML to Figma - Web Page Extractor plugin.
 ### [2.0.0] - Planned (Q4 2026)
 
 #### Planned Features
+
 - [ ] Direct Figma API integration
 - [ ] Cloud-based extraction (no local server)
 - [ ] AI-powered component naming
@@ -154,6 +167,7 @@ First public release of HTML to Figma - Web Page Extractor plugin.
 ## Support
 
 For bug reports and feature requests, please visit:
+
 - [GitHub Issues](https://github.com/kbishopzz/HTML-to-Figma/issues)
 - [GitHub Discussions](https://github.com/kbishopzz/HTML-to-Figma/discussions)
 
