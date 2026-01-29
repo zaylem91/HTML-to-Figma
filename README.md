@@ -1,112 +1,230 @@
 # HTML Whisperer: HTML to Figma Converter
 
-A Figma plugin that converts HTML/CSS structures (in JSON format) to editable Figma designs, preserving styles, layout, and component hierarchy.
+A powerful Figma plugin that converts websites to editable Figma designs with accurate visual replication. Extract any website and recreate it in Figma with preserved styling, layout, and typography.
 
-## 🚀 Features
+## 🚀 Key Features
 
-- Convert HTML/CSS structures to Figma frames, text, and shapes
-- Preserve styling including colors, text styles, borders, and more
-- Automatically convert flexbox layouts to Figma Auto Layout
-- Support for common HTML elements (text, images, inputs, etc.)
-- Configurable conversion options
+- **Visual Accuracy**: Preserves colors, fonts, spacing, borders, and shadows
+- **Layout Fidelity**: Automatically converts flexbox layouts to Figma Auto Layout
+- **Typography**: Maintains text styles, sizes, weights, and alignment
+- **Comprehensive Styling**: Supports borders, border-radius, box-shadows, opacity
+- **Smart Extraction**: Browser script captures complete page structure
+- **One-Click Conversion**: Paste JSON and convert instantly
+
+## 🎯 Quick Start (3 Steps)
+
+### Step 1: Extract a Website
+
+1. Open any website in your browser
+2. Open DevTools Console (F12 or Cmd+Option+I)
+3. Copy and paste the contents of `browser-extract.js`
+4. Press Enter
+5. JSON is automatically copied to clipboard!
+
+### Step 2: Import to Figma
+
+1. Open this plugin in Figma
+2. Paste the JSON into the text area
+3. Click "Convert to Figma"
+
+### Step 3: Edit Your Design
+
+The website is now in Figma with all elements editable!
+
+## 📦 What Gets Captured
+
+### Visual Properties
+
+- ✅ Colors (text, backgrounds, borders)
+- ✅ Typography (font family, size, weight, line height, letter spacing)
+- ✅ Text alignment and decoration
+- ✅ Borders and border radius
+- ✅ Box shadows
+- ✅ Opacity and visibility
+
+### Layout Properties
+
+- ✅ Exact positions and dimensions
+- ✅ Flexbox layouts (converted to Auto Layout)
+- ✅ Gap and spacing
+- ✅ Padding
+- ✅ Alignment properties
+
+### Elements
+
+- ✅ Text content
+- ✅ Images (as placeholders)
+- ✅ Buttons and inputs
+- ✅ Containers and frames
+- ✅ Links and interactive elements
 
 ## 🔧 How It Works
 
-1. **Input JSON**: Paste JSON data representing HTML/CSS structure
-2. **Configure Options**: Customize the conversion settings:
-   - Preserve colors and text styles
-   - Use Auto Layout
-   - Flatten empty divs
-   - Extract repeated elements as components
-   - Set default font family and viewport dimensions
-3. **Convert**: One-click conversion to Figma elements
-4. **Edit**: Work with the generated Figma elements just like native ones
+1. **Browser Extraction**: The `browser-extract.js` script analyzes the DOM and computed styles
+2. **JSON Format**: Creates a structured JSON with all visual and layout properties
+3. **Figma Conversion**: Plugin converts JSON to native Figma elements
+4. **Style Application**: Applies all CSS properties as Figma styles
+5. **Layout Creation**: Converts flexbox to Auto Layout for responsive designs
 
-## 🔍 Usage Guide
+## � Browser Extraction Script
 
-1. Run the plugin in Figma
-2. Paste JSON data (from your HTML parser) into the JSON tab
-3. Adjust conversion options as needed
-4. Click "Convert to Figma"
-5. Edit and refine the generated design
+The `browser-extract.js` file is a powerful script that captures any website's visual structure.
+
+### Features:
+
+- Captures all visible elements with accurate positions
+- Extracts computed styles (colors, fonts, borders, shadows)
+- Preserves layout properties (flexbox, alignment)
+- Filters out hidden and zero-size elements
+- Handles text content, images, and form inputs
+- Automatically copies JSON to clipboard
+
+### Usage:
+
+```bash
+# Open the script
+cat browser-extract.js
+
+# Copy the entire content
+# Paste into browser console on any website
+# JSON is automatically copied to clipboard!
+```
+
+### Advanced Usage:
+
+```javascript
+// Extract specific element instead of whole page
+extractPage("#header"); // Extract header only
+extractPage(".container"); // Extract by class
+
+// Access the JSON data
+console.log(window.figmaJson);
+```
+
+## 🎨 Conversion Options
+
+- **Preserve Colors**: Maintains all color properties
+- **Preserve Text Styles**: Keeps typography intact
+- **Use Auto Layout**: Converts flexbox to Figma Auto Layout
+- **Default Font Family**: Fallback font (default: Inter)
+
+## 📝 JSON Format
+
+The plugin accepts JSON with this structure:
+
+```json
+{
+  "type": "CANVAS",
+  "name": "My Design",
+  "children": [{
+    "type": "div",
+    "styles": {
+      "backgroundColor": "#ffffff",
+      "padding": "20px",
+      "display": "flex",
+      "flexDirection": "column"
+    },
+    "position": {
+      "absolute": {
+        "x": 0,
+        "y": 0,
+        "width": 1200,
+        "height": 800
+      }
+    },
+    "children": [...]
+  }]
+}
+```
 
 ## 🛠️ Development Setup
 
-To work on this plugin, you'll need:
-
-1. **Node.js and npm**: For dependency management
-2. **Figma Desktop App**: For testing the plugin
-
-### Getting Started
-
-1. Clone this repository
-2. Run `npm install` to install dependencies
-3. Make your changes to the code
-4. Load the plugin in Figma: Plugins > Development > Import plugin from manifest...
-
-## 📝 Notes
-
-- This plugin requires properly formatted JSON input describing HTML/CSS structure
-- For best results, ensure your HTML structure is well-formatted and uses standard CSS properties
-- The plugin works best with modern HTML that uses flexbox for layout
-
-## 🔮 Future Plans
-
-- Add AI integration for generating layouts from text prompts
-- Support for more complex CSS properties
-- Improved component extraction
-
-## 🧭 Developer: Build & install (Figma Desktop)
-
-1. Install dependencies and build the plugin bundle:
+### Build & Install
 
 ```bash
 npm install
 npm run build
 ```
 
-2. Import into Figma Desktop:
+### Import into Figma Desktop
 
-- Open Figma Desktop (the web app cannot import local dev plugins).
-- Menu: Plugins → Development → Import plugin from manifest...
-- Select this repo's `manifest.json` (project root).
+1. Open Figma Desktop
+2. Plugins → Development → Import plugin from manifest...
+3. Select `manifest.json` from this repo
+4. Run: Plugins → Development → HTML to Figma Converter
 
-3. Run the plugin:
+### Troubleshooting
 
-- Plugins → Development → HTML to Figma Converter (or the `name` in `manifest.json`).
-- The UI will open and (by default) pre-fill the bundled sample JSON. If "Auto-run on open" is enabled in Options, it will auto-convert the sample. Otherwise click "Convert to Figma" or use the new "Run now" button.
+- Open plugin console: Plugins → Development → Open Console
+- After code changes: `npm run build` and reload plugin
+- Font errors: Check that fonts are available in Figma
 
-4. Troubleshooting:
+## 💡 Tips for Best Results
 
-- Open the plugin console: Plugins → Development → Open Console — useful for font loading or JSON parse errors.
-- If you change code, re-run `npm run build` and re-open the plugin (no need to re-import the manifest).
+1. **Extract Clean Pages**: Pages with clean HTML structure convert better
+2. **Check Viewport**: Make sure the page is fully loaded before extraction
+3. **Use Specific Selectors**: Extract specific sections with `extractPage('#section-id')`
+4. **Adjust After Import**: Fine-tune spacing and alignment in Figma
+5. **Font Availability**: Ensure fonts used on the website are installed in Figma
 
-## 📥 How to convert any site into JSON for this plugin
+## 🔮 Advanced Features
 
-This plugin accepts either the repository's Figma-style JSON (see `sample-figma-design.json`) or a simple HTML-derived JSON shape as described in `src/types.ts`.
+### Auto Layout Conversion
 
-Quick way (browser): open the target site in a browser and run a small snippet in the DevTools console to extract a basic JSON snapshot of visible elements. Paste the resulting JSON into the plugin textarea and click Convert (or Run now).
+Flexbox layouts are automatically converted to Figma Auto Layout with:
 
-Example minimal DOM-to-JSON snippet (paste into the page's console):
+- Correct direction (horizontal/vertical)
+- Proper alignment and distribution
+- Gap spacing preserved
 
-```js
-// Minimal DOM snapshot -> JSON (visual bounding boxes + text)
-function pageToSimpleJson() {
-  const frames = [];
-  document.querySelectorAll("body > *").forEach((el, i) => {
-    const r = el.getBoundingClientRect();
-    const style = getComputedStyle(el);
-    const node = {
-      id: el.id || `el-${i}`,
-      name: el.tagName.toLowerCase(),
-      type: "FRAME",
-      x: Math.round(r.left),
-      y: Math.round(r.top),
-      width: Math.round(r.width),
-      height: Math.round(r.height),
-      backgroundColor: style.backgroundColor || undefined,
-      children: [],
-    };
+### Smart Text Handling
+
+- Text transforms (uppercase, lowercase, capitalize)
+- Text decoration (underline, strikethrough)
+- Multi-line text with proper wrapping
+- Text alignment (left, center, right, justify)
+
+### Visual Effects
+
+- Border radius on corners
+- Drop shadows and effects
+- Opacity and transparency
+- Stroke/border styling
+
+## 📚 Example Use Cases
+
+- **Design System Analysis**: Extract competitor websites to analyze their design systems
+- **Rapid Prototyping**: Convert existing pages as starting points
+- **Design Handoff**: Convert HTML prototypes to Figma for refinement
+- **Component Library**: Extract UI components for documentation
+- **Learning Tool**: Study how websites are structured visually
+
+## 🤝 Contributing
+
+Contributions welcome! Areas for improvement:
+
+- Better CSS gradient support
+- Image loading from URLs
+- More complex layout algorithms
+- Component extraction and deduplication
+- CSS Grid support
+
+## 📄 License
+
+MIT License - feel free to use and modify!
+
+---
+
+**Made for designers who want to move fast and replicate visually** 🎨✨
+name: el.tagName.toLowerCase(),
+type: "FRAME",
+x: Math.round(r.left),
+y: Math.round(r.top),
+width: Math.round(r.width),
+height: Math.round(r.height),
+backgroundColor: style.backgroundColor || undefined,
+children: [],
+};
 
     // collect direct text children
     const text = el.innerText && el.innerText.trim();
@@ -128,12 +246,14 @@ function pageToSimpleJson() {
     }
 
     frames.push(node);
-  });
-  return { frames };
+
+});
+return { frames };
 }
 
 // Run and copy the JSON to clipboard:
 copy(JSON.stringify(pageToSimpleJson(), null, 2));
+
 ```
 
 Notes:
@@ -142,3 +262,4 @@ Notes:
 - After copying, paste into the plugin JSON textarea and Convert.
 
 If you'd like, I can add a small `scripts/export-dom.js` helper that runs in a Puppeteer headless session to generate improved JSON for sites (useful for batch processing).
+```

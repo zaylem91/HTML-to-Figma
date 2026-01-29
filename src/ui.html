@@ -5,29 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>HTML to Figma</title>
     <style>
-      :root {
-        --figma-color-bg: #ffffff;
-        --figma-color-text: #333333;
-        --figma-color-brand: #0d99ff;
-        --figma-color-border: #e5e5e5;
-        --figma-color-hover: #f5f5f5;
-      }
-
-      @media (prefers-color-scheme: dark) {
-        :root {
-          --figma-color-bg: #2c2c2c;
-          --figma-color-text: #ffffff;
-          --figma-color-border: #444444;
-          --figma-color-hover: #3c3c3c;
-        }
-      }
-
       body {
-        font-family: "Inter", sans-serif;
         margin: 0;
         padding: 20px;
-        background-color: var(--figma-color-bg);
-        color: var(--figma-color-text);
+        background-color: #ffffff;
+        color: #333333;
         font-size: 12px;
       }
 
@@ -60,22 +42,21 @@
         width: 100%;
         padding: 8px 12px;
         font-size: 12px;
-        border: 1px solid var(--figma-color-border);
+        border: 1px solid #e5e5e5;
         border-radius: 4px;
-        background-color: var(--figma-color-bg);
-        color: var(--figma-color-text);
+        background-color: #ffffff;
+        color: #333333;
         box-sizing: border-box;
         min-height: 120px;
         resize: vertical;
-        font-family: "Courier New", monospace;
       }
 
       .file-upload {
         position: absolute;
         top: 8px;
         right: 8px;
-        background-color: var(--figma-color-bg);
-        border: 1px solid var(--figma-color-border);
+        background-color: #ffffff;
+        border: 1px solid #e5e5e5;
         border-radius: 4px;
         padding: 4px 8px;
         font-size: 10px;
@@ -98,7 +79,7 @@
       }
 
       button {
-        background-color: var(--figma-color-brand);
+        background-color: #0d99ff;
         color: white;
         border: none;
         padding: 10px 16px;
@@ -115,14 +96,14 @@
       }
 
       button:disabled {
-        background-color: var(--figma-color-border);
+        background-color: #e5e5e5;
         cursor: not-allowed;
       }
 
       .button-secondary {
         background-color: transparent;
-        color: var(--figma-color-text);
-        border: 1px solid var(--figma-color-border);
+        color: #333333;
+        border: 1px solid #e5e5e5;
         margin-top: 8px;
       }
 
@@ -135,7 +116,7 @@
       .tabs {
         display: flex;
         margin-bottom: 16px;
-        border-bottom: 1px solid var(--figma-color-border);
+        border-bottom: 1px solid #e5e5e5;
       }
 
       .tab {
@@ -145,7 +126,7 @@
       }
 
       .tab.active {
-        border-bottom: 2px solid var(--figma-color-brand);
+        border-bottom: 2px solid #0d99ff;
         font-weight: 500;
       }
 
@@ -166,19 +147,9 @@
       .spinner {
         border: 3px solid rgba(0, 0, 0, 0.1);
         border-radius: 50%;
-        border-top: 3px solid var(--figma-color-brand);
+        border-top: 3px solid #0d99ff;
         width: 20px;
         height: 20px;
-        animation: spin 1s linear infinite;
-      }
-
-      @keyframes spin {
-        0% {
-          transform: rotate(0deg);
-        }
-        100% {
-          transform: rotate(360deg);
-        }
       }
 
       .input-row {
@@ -205,10 +176,10 @@
         width: 100%;
         padding: 8px 12px;
         font-size: 12px;
-        border: 1px solid var(--figma-color-border);
+        border: 1px solid #e5e5e5;
         border-radius: 4px;
-        background-color: var(--figma-color-bg);
-        color: var(--figma-color-text);
+        background-color: #ffffff;
+        color: #333333;
         box-sizing: border-box;
       }
 
@@ -252,7 +223,10 @@
           </div>
           <div class="note">
             Paste Figma-style JSON or HTML-derived JSON. This plugin supports
-            both formats!
+            both formats!<br />
+            <strong>Note:</strong> Frames with light background colors may
+            appear as black outlines only on white pages. Select them in the
+            layers panel to adjust colors.
           </div>
         </div>
       </div>
@@ -327,15 +301,19 @@
         const tabContents = document.querySelectorAll(".tab-content");
 
         tabs.forEach((tab) => {
-          tab.addEventListener("click", function () {
-            // Remove active class from all tabs and contents
-            tabs.forEach((t) => t.classList.remove("active"));
-            tabContents.forEach((c) => c.classList.remove("active"));
+          tab.addEventListener(
+            "click",
+            function () {
+              // Remove active class from all tabs and contents
+              tabs.forEach((t) => t.classList.remove("active"));
+              tabContents.forEach((c) => c.classList.remove("active"));
 
-            // Add active class to current tab and content
-            this.classList.add("active");
-            document.getElementById(this.dataset.tab).classList.add("active");
-          });
+              // Add active class to current tab and content
+              this.classList.add("active");
+              document.getElementById(this.dataset.tab).classList.add("active");
+            },
+            { passive: true }
+          );
         });
 
         // File upload handling
@@ -371,28 +349,36 @@
           }
         });
 
-        jsonFileInput.addEventListener("change", function (event) {
-          const file = event.target.files[0];
-          if (file) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-              const contents = e.target.result;
-              jsonDataTextarea.value = contents;
-              // Mark that the user provided content so the startup sample
-              // won't overwrite it.
-              userProvidedJson = true;
-              statusMessage.textContent =
-                "File loaded. Click Convert or Run now.";
-            };
-            reader.readAsText(file);
-          }
-        });
+        jsonFileInput.addEventListener(
+          "change",
+          function (event) {
+            const file = event.target.files[0];
+            if (file) {
+              const reader = new FileReader();
+              reader.onload = function (e) {
+                const contents = e.target.result;
+                jsonDataTextarea.value = contents;
+                // Mark that the user provided content so the startup sample
+                // won't overwrite it.
+                userProvidedJson = true;
+                statusMessage.textContent =
+                  "File loaded. Click Convert or Run now.";
+              };
+              reader.readAsText(file);
+            }
+          },
+          { passive: true }
+        );
 
         // If the user types/pastes into the textarea, treat that as user-provided
         // content so the bundled sample won't overwrite it later.
-        jsonDataTextarea.addEventListener("input", function () {
-          userProvidedJson = true;
-        });
+        jsonDataTextarea.addEventListener(
+          "input",
+          function () {
+            userProvidedJson = true;
+          },
+          { passive: true }
+        );
 
         // Form submission
         const convertBtn = document.getElementById("convertBtn");
@@ -401,68 +387,11 @@
         const loadingIndicator = document.getElementById("loadingIndicator");
         const statusMessage = document.getElementById("statusMessage");
 
-        convertBtn.addEventListener("click", function () {
-          const jsonData = jsonDataTextarea.value;
-
-          if (!jsonData) {
-            statusMessage.textContent =
-              "Please paste JSON data or upload a JSON file.";
-            return;
-          }
-
-          try {
-            // Parse the JSON data
-            const parsedData = JSON.parse(jsonData);
-
-            // Get options
-            const options = {
-              preserveColors: document.getElementById("preserveColors").checked,
-              preserveTextStyles:
-                document.getElementById("preserveTextStyles").checked,
-              useAutoLayout: document.getElementById("useAutoLayout").checked,
-              flattenDivs: document.getElementById("flattenDivs").checked,
-              extractComponents:
-                document.getElementById("extractComponents").checked,
-              defaultFontFamily:
-                document.getElementById("defaultFontFamily").value,
-              viewportWidth: parseInt(
-                document.getElementById("viewportWidth").value
-              ),
-              viewportHeight: parseInt(
-                document.getElementById("viewportHeight").value
-              ),
-            };
-
-            // Show loading state
-            convertBtn.disabled = true;
-            if (runNowBtn) runNowBtn.disabled = true;
-            loadingIndicator.style.display = "flex";
-            statusMessage.textContent = "Converting JSON to Figma...";
-
-            // Send data to plugin code
-            parent.postMessage(
-              {
-                pluginMessage: {
-                  type: "convert-json",
-                  jsonData: parsedData,
-                  options,
-                },
-              },
-              "*"
-            );
-          } catch (error) {
-            statusMessage.textContent = "Error parsing JSON: " + error.message;
-          }
-        });
-
-        cancelBtn.addEventListener("click", function () {
-          parent.postMessage({ pluginMessage: { type: "cancel" } }, "*");
-        });
-
-        // Quick-run button (does the same as Convert but keeps the UI flow clear)
-        if (runNowBtn) {
-          runNowBtn.addEventListener("click", function () {
+        convertBtn.addEventListener(
+          "click",
+          function () {
             const jsonData = jsonDataTextarea.value;
+
             if (!jsonData) {
               statusMessage.textContent =
                 "Please paste JSON data or upload a JSON file.";
@@ -470,7 +399,10 @@
             }
 
             try {
+              // Parse the JSON data
               const parsedData = JSON.parse(jsonData);
+
+              // Get options
               const options = {
                 preserveColors:
                   document.getElementById("preserveColors").checked,
@@ -490,12 +422,13 @@
                 ),
               };
 
-              // Show quick-run state
+              // Show loading state
               convertBtn.disabled = true;
-              runNowBtn.disabled = true;
+              if (runNowBtn) runNowBtn.disabled = true;
               loadingIndicator.style.display = "flex";
-              statusMessage.textContent = "Running conversion...";
+              statusMessage.textContent = "Converting JSON to Figma...";
 
+              // Send data to plugin code
               parent.postMessage(
                 {
                   pluginMessage: {
@@ -506,11 +439,79 @@
                 },
                 "*"
               );
-            } catch (err) {
+            } catch (error) {
               statusMessage.textContent =
-                "Error parsing JSON: " + (err.message || err);
+                "Error parsing JSON: " + error.message;
             }
-          });
+          },
+          { passive: true }
+        );
+
+        cancelBtn.addEventListener(
+          "click",
+          function () {
+            parent.postMessage({ pluginMessage: { type: "cancel" } }, "*");
+          },
+          { passive: true }
+        );
+
+        // Quick-run button (does the same as Convert but keeps the UI flow clear)
+        if (runNowBtn) {
+          runNowBtn.addEventListener(
+            "click",
+            function () {
+              const jsonData = jsonDataTextarea.value;
+              if (!jsonData) {
+                statusMessage.textContent =
+                  "Please paste JSON data or upload a JSON file.";
+                return;
+              }
+
+              try {
+                const parsedData = JSON.parse(jsonData);
+                const options = {
+                  preserveColors:
+                    document.getElementById("preserveColors").checked,
+                  preserveTextStyles:
+                    document.getElementById("preserveTextStyles").checked,
+                  useAutoLayout:
+                    document.getElementById("useAutoLayout").checked,
+                  flattenDivs: document.getElementById("flattenDivs").checked,
+                  extractComponents:
+                    document.getElementById("extractComponents").checked,
+                  defaultFontFamily:
+                    document.getElementById("defaultFontFamily").value,
+                  viewportWidth: parseInt(
+                    document.getElementById("viewportWidth").value
+                  ),
+                  viewportHeight: parseInt(
+                    document.getElementById("viewportHeight").value
+                  ),
+                };
+
+                // Show quick-run state
+                convertBtn.disabled = true;
+                runNowBtn.disabled = true;
+                loadingIndicator.style.display = "flex";
+                statusMessage.textContent = "Running conversion...";
+
+                parent.postMessage(
+                  {
+                    pluginMessage: {
+                      type: "convert-json",
+                      jsonData: parsedData,
+                      options,
+                    },
+                  },
+                  "*"
+                );
+              } catch (err) {
+                statusMessage.textContent =
+                  "Error parsing JSON: " + (err.message || err);
+              }
+            },
+            { passive: true }
+          );
         }
 
         // Listen for messages from the plugin code
@@ -546,11 +547,7 @@
 
             // Pre-fill the textarea with bundled sample JSON (formatted)
             try {
-              jsonDataTextarea.value = JSON.stringify(
-                message.jsonData,
-                null,
-                2
-              );
+              jsonDataTextarea.value = JSON.stringify(message.jsonData);
             } catch (e) {
               // If message.jsonData is already a string
               jsonDataTextarea.value = message.jsonData || "";

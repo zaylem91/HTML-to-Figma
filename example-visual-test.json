@@ -1,0 +1,313 @@
+{
+  "type": "CANVAS",
+  "name": "Example: Visual Replication Test",
+  "url": "https://example.com",
+  "extractedAt": "2026-01-29",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "children": [
+    {
+      "type": "div",
+      "id": "container",
+      "styles": {
+        "display": "flex",
+        "flexDirection": "column",
+        "gap": "24px",
+        "padding": "40px",
+        "backgroundColor": "#f8f9fa",
+        "borderRadius": "16px",
+        "boxShadow": "0px 4px 12px 0px rgba(0,0,0,0.1)"
+      },
+      "position": {
+        "absolute": {
+          "x": 100,
+          "y": 100,
+          "width": 800,
+          "height": 600
+        }
+      },
+      "children": [
+        {
+          "type": "text",
+          "text": "Beautiful Design",
+          "styles": {
+            "fontSize": "48px",
+            "fontWeight": "700",
+            "color": "#1a1a1a",
+            "textAlign": "center",
+            "letterSpacing": "-0.5px"
+          },
+          "position": {
+            "absolute": {
+              "width": 720,
+              "height": 60
+            }
+          }
+        },
+        {
+          "type": "text",
+          "text": "This demonstrates the enhanced visual replication capabilities",
+          "styles": {
+            "fontSize": "18px",
+            "fontWeight": "400",
+            "color": "#6c757d",
+            "textAlign": "center",
+            "lineHeight": "28px"
+          },
+          "position": {
+            "absolute": {
+              "width": 720,
+              "height": 56
+            }
+          }
+        },
+        {
+          "type": "div",
+          "classes": ["button-container"],
+          "styles": {
+            "display": "flex",
+            "flexDirection": "row",
+            "gap": "16px",
+            "justifyContent": "center",
+            "alignItems": "center"
+          },
+          "position": {
+            "absolute": {
+              "width": 720,
+              "height": 50
+            }
+          },
+          "children": [
+            {
+              "type": "button",
+              "text": "Primary Action",
+              "styles": {
+                "backgroundColor": "#0066ff",
+                "color": "#ffffff",
+                "fontSize": "16px",
+                "fontWeight": "600",
+                "padding": "12px 32px",
+                "borderRadius": "8px",
+                "border": "2px",
+                "borderColor": "#0066ff"
+              },
+              "position": {
+                "absolute": {
+                  "width": 180,
+                  "height": 50
+                }
+              }
+            },
+            {
+              "type": "button",
+              "text": "Secondary",
+              "styles": {
+                "backgroundColor": "#ffffff",
+                "color": "#0066ff",
+                "fontSize": "16px",
+                "fontWeight": "600",
+                "padding": "12px 32px",
+                "borderRadius": "8px",
+                "border": "2px",
+                "borderColor": "#0066ff"
+              },
+              "position": {
+                "absolute": {
+                  "width": 150,
+                  "height": 50
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "div",
+          "classes": ["card-grid"],
+          "styles": {
+            "display": "flex",
+            "flexDirection": "row",
+            "gap": "20px",
+            "justifyContent": "space-between"
+          },
+          "position": {
+            "absolute": {
+              "width": 720,
+              "height": 200
+            }
+          },
+          "children": [
+            {
+              "type": "div",
+              "classes": ["card"],
+              "styles": {
+                "backgroundColor": "#ffffff",
+                "padding": "24px",
+                "borderRadius": "12px",
+                "border": "1px",
+                "borderColor": "#e0e0e0",
+                "boxShadow": "0px 2px 8px 0px rgba(0,0,0,0.08)"
+              },
+              "position": {
+                "absolute": {
+                  "width": 226,
+                  "height": 200
+                }
+              },
+              "children": [
+                {
+                  "type": "text",
+                  "text": "Feature One",
+                  "styles": {
+                    "fontSize": "20px",
+                    "fontWeight": "600",
+                    "color": "#1a1a1a"
+                  },
+                  "position": {
+                    "absolute": {
+                      "width": 178,
+                      "height": 28
+                    }
+                  }
+                },
+                {
+                  "type": "text",
+                  "text": "With borders, shadows, and proper spacing preserved.",
+                  "styles": {
+                    "fontSize": "14px",
+                    "fontWeight": "400",
+                    "color": "#6c757d",
+                    "lineHeight": "22px"
+                  },
+                  "position": {
+                    "absolute": {
+                      "width": 178,
+                      "height": 66
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "type": "div",
+              "classes": ["card"],
+              "styles": {
+                "backgroundColor": "#ffffff",
+                "padding": "24px",
+                "borderRadius": "12px",
+                "border": "1px",
+                "borderColor": "#e0e0e0",
+                "boxShadow": "0px 2px 8px 0px rgba(0,0,0,0.08)"
+              },
+              "position": {
+                "absolute": {
+                  "width": 226,
+                  "height": 200
+                }
+              },
+              "children": [
+                {
+                  "type": "text",
+                  "text": "Feature Two",
+                  "styles": {
+                    "fontSize": "20px",
+                    "fontWeight": "600",
+                    "color": "#1a1a1a"
+                  },
+                  "position": {
+                    "absolute": {
+                      "width": 178,
+                      "height": 28
+                    }
+                  }
+                },
+                {
+                  "type": "text",
+                  "text": "Typography, colors, and layout all work perfectly.",
+                  "styles": {
+                    "fontSize": "14px",
+                    "fontWeight": "400",
+                    "color": "#6c757d",
+                    "lineHeight": "22px"
+                  },
+                  "position": {
+                    "absolute": {
+                      "width": 178,
+                      "height": 66
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "type": "div",
+              "classes": ["card"],
+              "styles": {
+                "backgroundColor": "#ffffff",
+                "padding": "24px",
+                "borderRadius": "12px",
+                "border": "1px",
+                "borderColor": "#e0e0e0",
+                "boxShadow": "0px 2px 8px 0px rgba(0,0,0,0.08)"
+              },
+              "position": {
+                "absolute": {
+                  "width": 226,
+                  "height": 200
+                }
+              },
+              "children": [
+                {
+                  "type": "text",
+                  "text": "Feature Three",
+                  "styles": {
+                    "fontSize": "20px",
+                    "fontWeight": "600",
+                    "color": "#1a1a1a"
+                  },
+                  "position": {
+                    "absolute": {
+                      "width": 178,
+                      "height": 28
+                    }
+                  }
+                },
+                {
+                  "type": "text",
+                  "text": "Auto Layout makes it responsive and easy to adjust.",
+                  "styles": {
+                    "fontSize": "14px",
+                    "fontWeight": "400",
+                    "color": "#6c757d",
+                    "lineHeight": "22px"
+                  },
+                  "position": {
+                    "absolute": {
+                      "width": 178,
+                      "height": 66
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "img",
+          "alt": "Example image placeholder",
+          "styles": {
+            "borderRadius": "12px",
+            "objectFit": "cover"
+          },
+          "position": {
+            "absolute": {
+              "width": 720,
+              "height": 120
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

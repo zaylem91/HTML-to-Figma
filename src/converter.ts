@@ -4,6 +4,7 @@ import {
   ColorObject,
   NodeCreators,
   FigmaJsonNode,
+  Styles,
 } from "./types";
 
 // Utility type guard to check if a node can have children
@@ -145,6 +146,58 @@ async function loadFontWithFallback(
 }
 
 /**
+ * Apply border styles to a Figma node
+ */
+function applyBorderStyles(figmaNode: SceneNode, styles: Styles | undefined) {
+  if (!styles) return;
+  
+  const borderWidth = parseDimension(styles.borderWidth || styles.border, 0);
+  const borderColor = styles.borderColor || '#000000';
+  
+  if (borderWidth > 0 && (figmaNode.type === 'FRAME' || figmaNode.type === 'RECTANGLE')) {
+    const node = figmaNode as FrameNode | RectangleNode;
+    node.strokes = [{
+      type: 'SOLID',
+      color: parseColor(borderColor)
+    }];
+    node.strokeWeight = borderWidth;
+    
+    // Border radius
+    const borderRadius = parseDimension(styles.borderRadius, 0);
+    if (borderRadius > 0) {
+      if (node.type === 'RECTANGLE') {
+        node.cornerRadius = borderRadius;
+      } else if (node.type === 'FRAME') {
+        node.cornerRadius = borderRadius;
+      }
+    }
+  }
+}
+
+/**
+ * Apply shadow/box-shadow to a Figma node
+ */
+function applyShadowStyles(figmaNode: SceneNode, styles: Styles | undefined) {
+  if (!styles || !styles.boxShadow) return;
+  
+  // Simple box-shadow parser (handles basic cases)
+  const shadowStr = styles.boxShadow;
+  const shadowMatch = shadowStr.match(/([\d.]+)px\s+([\d.]+)px\s+([\d.]+)px\s+([\d.]+)px\s+(.+)/);
+  
+  if (shadowMatch && (figmaNode.type === 'FRAME' || figmaNode.type === 'RECTANGLE' || figmaNode.type === 'TEXT')) {
+    const [, offsetX, offsetY, blurRadius, spreadRadius, color] = shadowMatch;
+    (figmaNode as any).effects = [{
+      type: 'DROP_SHADOW',
+      color: { ...parseColor(color), a: 0.25 },
+      offset: { x: parseFloat(offsetX), y: parseFloat(offsetY) },
+      radius: parseFloat(blurRadius),
+      visible: true,
+      blendMode: 'NORMAL'
+    }];
+  }
+}
+
+/**
  * Derive absolute positioning values for HTML-derived nodes.
  */
 function extractAbsolutePosition(node: JsonNode | undefined): {
@@ -214,6 +267,10 @@ async function convertFigmaJsonToNodes(
     for (const frameData of json.frames) {
       const frame = await processFigmaNode(frameData);
       if (frame) {
+        // Remove fills from top-level frames to make content visible
+        if (frame.type === "FRAME") {
+          (frame as FrameNode).fills = [];
+        }
         processedFrames.push(frame);
       }
     }
@@ -286,11 +343,11 @@ async function processFigmaNode(node: FigmaJsonNode): Promise<SceneNode> {
       figmaNode = figma.createText();
 
       // Get text content from either 'characters' or 'text' property
-      const textContent = (node as any).characters || node.text || "";
+      const textContent = (node as any).characters || (node as any).text || "";
 
       if (textContent) {
         // Determine font family and style
-        const fontFamily =
+        let fontFamily =
           (node as any).fontName?.family || node.style?.fontFamily || "Inter";
         const fontStyleFromName = (node as any).fontName?.style || "Regular";
         const fontWeightFromStyle = node.style?.fontWeight;
@@ -306,7 +363,7 @@ async function processFigmaNode(node: FigmaJsonNode): Promise<SceneNode> {
               : "Regular";
         }
 
-        // Load font
+        // Load font BEFORE setting characters
         try {
           await figma.loadFontAsync({
             family: fontFamily,
@@ -318,16 +375,18 @@ async function processFigmaNode(node: FigmaJsonNode): Promise<SceneNode> {
             err
           );
           await figma.loadFontAsync({ family: "Inter", style: "Regular" });
+          finalFontStyle = "Regular";
+          fontFamily = "Inter";
         }
 
-        // Set text content FIRST
-        (figmaNode as TextNode).characters = textContent;
-
-        // Set font name
+        // Set font name FIRST
         (figmaNode as TextNode).fontName = {
           family: fontFamily,
           style: finalFontStyle,
         };
+
+        // Set text content AFTER font is loaded
+        (figmaNode as TextNode).characters = textContent;
 
         // Apply font size
         const fontSize = (node as any).fontSize || node.style?.fontSize || 16;
@@ -399,10 +458,10 @@ async function processFigmaNode(node: FigmaJsonNode): Promise<SceneNode> {
 
   // Size - always set, fallback to 100x100 if missing
   if (figmaNode.type === "TEXT") {
-    // For text nodes, set characters first, then resize
-    const w = node.width !== undefined ? node.width : 200;
-    const h = node.height !== undefined ? node.height : 32;
-    (figmaNode as TextNode).resize(w, h);
+    // For text nodes, don't resize to avoid clipping with textAutoResize
+    // const w = node.width !== undefined ? node.width : 200;
+    // const h = node.height !== undefined ? node.height : 32;
+    // (figmaNode as TextNode).resize(w, h);
   } else {
     const w = node.width !== undefined ? node.width : 100;
     const h = node.height !== undefined ? node.height : 100;
@@ -411,10 +470,15 @@ async function processFigmaNode(node: FigmaJsonNode): Promise<SceneNode> {
 
   // Background color
   if (node.backgroundColor && figmaNode.type !== "TEXT") {
+    const color = parseColor(node.backgroundColor);
+    // Darken the color to make it more visible
+    color.r = Math.max(0, color.r - 0.3);
+    color.g = Math.max(0, color.g - 0.3);
+    color.b = Math.max(0, color.b - 0.3);
     (figmaNode as FrameNode | RectangleNode).fills = [
       {
         type: "SOLID",
-        color: parseColor(node.backgroundColor),
+        color: color,
       },
     ];
   }
@@ -464,9 +528,10 @@ export function parseDimension(
   if (typeof value === "number") return value;
   if (value == null) return defaultValue;
   if (typeof value === "string") {
-    const cleanValue = value.replace(/px$/, "").trim();
+    // Handle various CSS units
+    const cleanValue = value.replace(/(px|pt|em|rem|%)$/, "").trim();
     const parsedValue = parseFloat(cleanValue);
-    return !isNaN(parsedValue) ? parsedValue : defaultValue;
+    return !isNaN(parsedValue) && parsedValue > 0 ? parsedValue : defaultValue;
   }
   return defaultValue;
 }
@@ -536,6 +601,11 @@ export async function processJsonNode(
 ): Promise<SceneNode | null> {
   if (!node) return null;
 
+  // Skip invisible nodes
+  if (node.styles?.visibility === 'hidden' || node.styles?.display === 'none') {
+    return null;
+  }
+
   let figmaNode: SceneNode;
 
   const createNode = (() => {
@@ -547,6 +617,7 @@ export async function processJsonNode(
       case "input":
       case "textarea":
       case "select":
+      case "button":
         return nodeCreators.createInputNode;
       default:
         return nodeCreators.createFrameNode;
@@ -557,12 +628,29 @@ export async function processJsonNode(
     ? createNode(node, options)
     : nodeCreators.createFrameNode(node, options));
 
+  // Apply positioning
   const { x, y } = extractAbsolutePosition(node);
   if ("x" in figmaNode && typeof figmaNode.x === "number") {
     figmaNode.x = x;
   }
   if ("y" in figmaNode && typeof figmaNode.y === "number") {
     figmaNode.y = y;
+  }
+
+  // Apply opacity
+  if (node.styles?.opacity) {
+    const opacity = parseFloat(node.styles.opacity);
+    if (!isNaN(opacity) && opacity >= 0 && opacity <= 1) {
+      if ('opacity' in figmaNode) {
+        (figmaNode as any).opacity = opacity;
+      }
+    }
+  }
+
+  // Store z-index for potential reordering
+  if (node.styles?.zIndex) {
+    // Store as plugin data for reference
+    // figmaNode.setPluginData('zIndex', node.styles.zIndex);
   }
 
   if (isParentNode(parentNode)) {
@@ -610,14 +698,14 @@ export const nodeCreators: NodeCreators = {
     if (options.preserveTextStyles && node.styles) {
       if (node.styles.fontSize) {
         const size = parseFloat(node.styles.fontSize);
-        if (!isNaN(size)) {
+        if (!isNaN(size) && size > 0) {
           textNode.fontSize = size;
         }
       }
 
       if (node.styles.lineHeight) {
         const lh = parseFloat(node.styles.lineHeight);
-        if (!isNaN(lh)) {
+        if (!isNaN(lh) && lh > 0) {
           textNode.lineHeight = { value: lh, unit: "PIXELS" };
         }
       }
@@ -629,6 +717,33 @@ export const nodeCreators: NodeCreators = {
         }
       }
 
+      // Text alignment
+      const textAlign = node.styles.textAlign;
+      if (textAlign === 'center') {
+        textNode.textAlignHorizontal = 'CENTER';
+      } else if (textAlign === 'right') {
+        textNode.textAlignHorizontal = 'RIGHT';
+      } else if (textAlign === 'justify') {
+        textNode.textAlignHorizontal = 'JUSTIFIED';
+      }
+
+      // Text decoration
+      if (node.styles.textDecoration?.includes('underline')) {
+        textNode.textDecoration = 'UNDERLINE';
+      } else if (node.styles.textDecoration?.includes('line-through')) {
+        textNode.textDecoration = 'STRIKETHROUGH';
+      }
+
+      // Text transform (approximate)
+      let textContent = node.text || node.placeholder || "";
+      if (node.styles.textTransform === 'uppercase') {
+        textContent = textContent.toUpperCase();
+      } else if (node.styles.textTransform === 'lowercase') {
+        textContent = textContent.toLowerCase();
+      } else if (node.styles.textTransform === 'capitalize') {
+        textContent = textContent.replace(/\b\w/g, l => l.toUpperCase());
+      }
+
       if (options.preserveColors && node.styles.color) {
         textNode.fills = [
           {
@@ -637,14 +752,29 @@ export const nodeCreators: NodeCreators = {
           },
         ];
       }
+
+      // Set characters
+      textNode.characters = textContent;
+
+      // Text shadow
+      if (node.styles.textShadow) {
+        applyShadowStyles(textNode, node.styles);
+      }
+    } else {
+      textNode.characters = node.text || node.placeholder || "";
     }
 
+    // Size handling
     const width = parseDimension(node?.position?.absolute?.width, 200);
     const height = parseDimension(node?.position?.absolute?.height, 32);
 
-    textNode.textAutoResize = "WIDTH_AND_HEIGHT";
-    textNode.resize(width, height);
-    textNode.characters = node.text || node.placeholder || "";
+    // Auto-resize based on content
+    if (width > 800 || node.styles?.whiteSpace === 'normal') {
+      textNode.textAutoResize = "HEIGHT";
+      textNode.resize(width, 100);
+    } else {
+      textNode.textAutoResize = "WIDTH_AND_HEIGHT";
+    }
 
     return textNode;
   },
@@ -657,12 +787,36 @@ export const nodeCreators: NodeCreators = {
     const height = parseDimension(node?.position?.absolute?.height);
     rect.resize(width, height);
 
+    // Create a more visible placeholder for images
     rect.fills = [
       {
         type: "SOLID",
-        color: { r: 0.9, g: 0.9, b: 0.9 },
+        color: { r: 0.85, g: 0.85, b: 0.85 },
       },
     ];
+
+    // Add border to indicate it's an image placeholder
+    rect.strokes = [
+      {
+        type: "SOLID",
+        color: { r: 0.7, g: 0.7, b: 0.7 },
+      },
+    ];
+    rect.strokeWeight = 1;
+
+    // Handle border radius from styles
+    if (node.styles?.borderRadius) {
+      const borderRadius = parseDimension(node.styles.borderRadius, 0);
+      if (borderRadius > 0) {
+        rect.cornerRadius = borderRadius;
+      }
+    }
+
+    // Handle object-fit styles
+    if (node.styles?.objectFit) {
+      // Store metadata for potential future image loading
+      // rect.setPluginData('objectFit', node.styles.objectFit);
+    }
 
     return rect;
   },
@@ -672,18 +826,56 @@ export const nodeCreators: NodeCreators = {
     options: ConversionOptions
   ): Promise<FrameNode> {
     const frame = figma.createFrame();
-    frame.name = `input[type=${node.type || "text"}]`;
+    const inputType = node.styles?.type || node.type || "text";
+    frame.name = `input[type=${inputType}]`;
 
     const width = parseDimension(node?.position?.absolute?.width);
-    const height = parseDimension(node?.position?.absolute?.height);
+    const height = parseDimension(node?.position?.absolute?.height, 40);
     frame.resize(width, height);
 
+    // Default input styling
     frame.fills = [
       {
         type: "SOLID",
         color: { r: 1, g: 1, b: 1 },
       },
     ];
+
+    // Add border
+    frame.strokes = [
+      {
+        type: "SOLID",
+        color: { r: 0.8, g: 0.8, b: 0.8 },
+      },
+    ];
+    frame.strokeWeight = 1;
+
+    // Apply custom borders if present
+    if (node.styles) {
+      applyBorderStyles(frame, node.styles);
+    }
+
+    // Add padding
+    frame.paddingLeft = 12;
+    frame.paddingRight = 12;
+    frame.paddingTop = 8;
+    frame.paddingBottom = 8;
+
+    // Add placeholder text if present
+    if (node.placeholder || node.text) {
+      const textNode = figma.createText();
+      await figma.loadFontAsync({ family: "Inter", style: "Regular" });
+      textNode.fontName = { family: "Inter", style: "Regular" };
+      textNode.characters = node.placeholder || node.text || "";
+      textNode.fontSize = 14;
+      textNode.fills = [
+        {
+          type: "SOLID",
+          color: { r: 0.6, g: 0.6, b: 0.6 },
+        },
+      ];
+      frame.appendChild(textNode);
+    }
 
     return frame;
   },
@@ -702,17 +894,68 @@ export const nodeCreators: NodeCreators = {
     const height = parseDimension(node?.position?.absolute?.height);
     frame.resize(width, height);
 
-    if (
-      options.preserveColors &&
-      node.styles?.backgroundColor &&
-      node.styles.backgroundColor !== "transparent"
-    ) {
-      frame.fills = [
-        {
-          type: "SOLID",
-          color: parseColor(node.styles.backgroundColor),
-        },
-      ];
+    // Background color with transparency support
+    if (options.preserveColors && node.styles?.backgroundColor) {
+      const bgColor = node.styles.backgroundColor;
+      if (bgColor && bgColor !== "transparent" && bgColor !== "rgba(0,0,0,0)") {
+        frame.fills = [
+          {
+            type: "SOLID",
+            color: parseColor(bgColor),
+          },
+        ];
+      } else {
+        frame.fills = []; // Transparent
+      }
+    }
+
+    // Apply borders and shadows
+    if (options.preserveColors) {
+      applyBorderStyles(frame, node.styles);
+      applyShadowStyles(frame, node.styles);
+    }
+
+    // Padding - adjust frame clipping
+    if (node.styles?.padding) {
+      const padding = parseDimension(node.styles.padding, 0);
+      if (padding > 0) {
+        frame.paddingLeft = padding;
+        frame.paddingRight = padding;
+        frame.paddingTop = padding;
+        frame.paddingBottom = padding;
+      }
+    }
+
+    // Flexbox layout
+    if (options.useAutoLayout && node.styles) {
+      const display = node.styles.display;
+      if (display === 'flex' || display === 'inline-flex') {
+        frame.layoutMode = node.styles.flexDirection === 'column' ? 'VERTICAL' : 'HORIZONTAL';
+        
+        // Flex gap
+        const gap = parseDimension(node.styles.gap || node.styles.gridGap, 0);
+        if (gap > 0) {
+          frame.itemSpacing = gap;
+        }
+        
+        // Justify content
+        const justifyContent = node.styles.justifyContent;
+        if (justifyContent === 'center') {
+          frame.primaryAxisAlignItems = 'CENTER';
+        } else if (justifyContent === 'flex-end' || justifyContent === 'end') {
+          frame.primaryAxisAlignItems = 'MAX';
+        } else if (justifyContent === 'space-between') {
+          frame.primaryAxisAlignItems = 'SPACE_BETWEEN';
+        }
+        
+        // Align items
+        const alignItems = node.styles.alignItems;
+        if (alignItems === 'center') {
+          frame.counterAxisAlignItems = 'CENTER';
+        } else if (alignItems === 'flex-end' || alignItems === 'end') {
+          frame.counterAxisAlignItems = 'MAX';
+        }
+      }
     }
 
     return frame;

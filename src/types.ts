@@ -7,7 +7,45 @@ export interface Position {
 }
 
 export interface Styles {
-  [key: string]: string;
+  [key: string]: string | undefined;
+  // Common CSS properties
+  backgroundColor?: string;
+  color?: string;
+  fontSize?: string;
+  fontFamily?: string;
+  fontWeight?: string;
+  lineHeight?: string;
+  letterSpacing?: string;
+  textAlign?: string;
+  textDecoration?: string;
+  textTransform?: string;
+  textShadow?: string;
+  borderWidth?: string;
+  border?: string;
+  borderColor?: string;
+  borderRadius?: string;
+  boxShadow?: string;
+  padding?: string;
+  margin?: string;
+  display?: string;
+  flexDirection?: string;
+  justifyContent?: string;
+  alignItems?: string;
+  gap?: string;
+  gridGap?: string;
+  position?: string;
+  top?: string;
+  left?: string;
+  right?: string;
+  bottom?: string;
+  width?: string;
+  height?: string;
+  opacity?: string;
+  visibility?: string;
+  overflow?: string;
+  whiteSpace?: string;
+  objectFit?: string;
+  zIndex?: string;
 }
 
 export interface JsonNode {
