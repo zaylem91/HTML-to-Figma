@@ -2,19 +2,12 @@ import { convertJsonToFigma } from "./converter";
 import { JsonNode, ConversionOptions } from "./types";
 // Import UI HTML (raw-loader will inline this as a string)
 import uiHtml from "./ui.html";
-// Bundle the sample Figma-style JSON so the UI can be pre-filled in dev
-import sampleFigma from "../sample-figma-design.json";
 
 // Show the UI
 figma.showUI(uiHtml, { width: 450, height: 650 });
 
-// Load sample JSON for development
-setTimeout(() => {
-  figma.ui.postMessage({
-    type: "load-sample",
-    jsonData: sampleFigma,
-  });
-}, 100);
+// Note: Sample JSON loading removed for production use
+// Users should paste their own extracted JSON from browser-extract.js
 
 // Listen for messages from the UI
 figma.ui.onmessage = async (msg) => {

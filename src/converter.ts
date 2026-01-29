@@ -241,6 +241,10 @@ async function convertFigmaJsonToNodes(
     const rootFrame = figma.createFrame();
     rootFrame.name = json.name || "Imported Design";
     rootFrame.fills = [];
+    
+    // Position at origin for visibility
+    rootFrame.x = 0;
+    rootFrame.y = 0;
 
     // Set a reasonable default size
     rootFrame.resize(1440, 900);
