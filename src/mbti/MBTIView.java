@@ -16,6 +16,8 @@ public class MBTIView extends FrameView {
 
     JFrame jframe;
     MBTIQuestion currentQuestion;
+    int progressMax;
+    int progressIndex;
     
     public MBTIView(SingleFrameApplication app) {
         super(app);
@@ -36,10 +38,13 @@ public class MBTIView extends FrameView {
     private void initComponents() {
 
         panQuestion = new javax.swing.JPanel();
-        rbtnSelectA = new javax.swing.JRadioButton();
-        rbtnSelectB = new javax.swing.JRadioButton();
         labStep = new javax.swing.JLabel();
         labQuestion = new javax.swing.JLabel();
+        rbtnSelectA = new javax.swing.JRadioButton();
+        rbtnSelectB = new javax.swing.JRadioButton();
+        labProgress = new javax.swing.JLabel();
+        prbProgress = new javax.swing.JProgressBar();
+        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 0));
         buttonGroup1 = new javax.swing.ButtonGroup();
         panMain = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -52,12 +57,21 @@ public class MBTIView extends FrameView {
         jLabel2 = new javax.swing.JLabel();
         btnClose = new javax.swing.JButton();
 
+        panQuestion.setAutoscrolls(true);
         panQuestion.setMinimumSize(new java.awt.Dimension(500, 260));
         panQuestion.setName("panQuestion"); // NOI18N
         panQuestion.setPreferredSize(new java.awt.Dimension(500, 260));
 
-        buttonGroup1.add(rbtnSelectA);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mbti.MBTIApp.class).getContext().getResourceMap(MBTIView.class);
+        labStep.setFont(resourceMap.getFont("labStep.font")); // NOI18N
+        labStep.setText(resourceMap.getString("labStep.text")); // NOI18N
+        labStep.setName("labStep"); // NOI18N
+
+        labQuestion.setFont(resourceMap.getFont("labStep.font")); // NOI18N
+        labQuestion.setText(resourceMap.getString("labQuestion.text")); // NOI18N
+        labQuestion.setName("labQuestion"); // NOI18N
+
+        buttonGroup1.add(rbtnSelectA);
         rbtnSelectA.setFont(resourceMap.getFont("rbtnSelectA.font")); // NOI18N
         rbtnSelectA.setText(resourceMap.getString("rbtnSelectA.text")); // NOI18N
         rbtnSelectA.setName("rbtnSelectA"); // NOI18N
@@ -77,43 +91,58 @@ public class MBTIView extends FrameView {
             }
         });
 
-        labStep.setFont(resourceMap.getFont("labStep.font")); // NOI18N
-        labStep.setText(resourceMap.getString("labStep.text")); // NOI18N
-        labStep.setName("labStep"); // NOI18N
+        labProgress.setText(resourceMap.getString("labProgress.text")); // NOI18N
+        labProgress.setName("labProgress"); // NOI18N
 
-        labQuestion.setFont(resourceMap.getFont("labStep.font")); // NOI18N
-        labQuestion.setText(resourceMap.getString("labQuestion.text")); // NOI18N
-        labQuestion.setName("labQuestion"); // NOI18N
+        prbProgress.setName("prbProgress"); // NOI18N
+
+        filler1.setName("filler1"); // NOI18N
 
         javax.swing.GroupLayout panQuestionLayout = new javax.swing.GroupLayout(panQuestion);
         panQuestion.setLayout(panQuestionLayout);
         panQuestionLayout.setHorizontalGroup(
             panQuestionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panQuestionLayout.createSequentialGroup()
-                .addGroup(panQuestionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(panQuestionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(panQuestionLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(labStep))
-                    .addGroup(panQuestionLayout.createSequentialGroup()
-                        .addGap(48, 48, 48)
+                        .addGap(66, 66, 66)
                         .addGroup(panQuestionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(rbtnSelectB)
-                            .addComponent(rbtnSelectA)
-                            .addComponent(labQuestion))))
-                .addContainerGap(373, Short.MAX_VALUE))
+                            .addComponent(rbtnSelectB, javax.swing.GroupLayout.DEFAULT_SIZE, 424, Short.MAX_VALUE)
+                            .addComponent(rbtnSelectA, javax.swing.GroupLayout.DEFAULT_SIZE, 424, Short.MAX_VALUE))
+                        .addGap(10, 10, 10))
+                    .addGroup(panQuestionLayout.createSequentialGroup()
+                        .addGroup(panQuestionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panQuestionLayout.createSequentialGroup()
+                                .addGap(17, 17, 17)
+                                .addComponent(labStep, javax.swing.GroupLayout.DEFAULT_SIZE, 473, Short.MAX_VALUE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panQuestionLayout.createSequentialGroup()
+                                .addGap(53, 53, 53)
+                                .addComponent(labQuestion, javax.swing.GroupLayout.DEFAULT_SIZE, 437, Short.MAX_VALUE))
+                            .addGroup(panQuestionLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(labProgress)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
+                .addComponent(filler1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addComponent(prbProgress, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
         );
         panQuestionLayout.setVerticalGroup(
             panQuestionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panQuestionLayout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panQuestionLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(labStep)
-                .addGap(18, 18, 18)
-                .addComponent(labQuestion)
-                .addGap(18, 18, 18)
-                .addComponent(rbtnSelectA)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(rbtnSelectB)
-                .addContainerGap(112, Short.MAX_VALUE))
+                .addGroup(panQuestionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(filler1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, panQuestionLayout.createSequentialGroup()
+                        .addComponent(labStep)
+                        .addGap(28, 28, 28)
+                        .addComponent(labQuestion)
+                        .addGap(18, 18, 18)
+                        .addComponent(rbtnSelectA)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(rbtnSelectB)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(labProgress)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(prbProgress, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         panMain.setMinimumSize(new java.awt.Dimension(800, 400));
@@ -291,6 +320,10 @@ public class MBTIView extends FrameView {
     private void StartTest(){
         
         MBTIApp.InitMBTI();
+        progressMax = 93;
+        progressIndex = 0;
+        prbProgress.setMinimum(0);
+        prbProgress.setMaximum(progressMax);
         LoadNewQuestion();
         
         
@@ -315,6 +348,10 @@ public class MBTIView extends FrameView {
             labQuestion.setText("<html>" + currentQuestion.getQuestionString() + "</html>");
             rbtnSelectA.setText("<html>" + currentQuestion.getSelectAString() + "</html>");
             rbtnSelectB.setText("<html>" + currentQuestion.getSelectBString() + "</html>");
+            
+            progressIndex++;
+            prbProgress.setValue(progressIndex);
+            labProgress.setText(progressIndex + "/" + progressMax);
         }  
     }
     /*
@@ -351,16 +388,19 @@ public class MBTIView extends FrameView {
     private javax.swing.JButton btnClose;
     private javax.swing.JButton btnStart;
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.Box.Filler filler1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JLabel labProgress;
     private javax.swing.JLabel labQuestion;
     private javax.swing.JLabel labStep;
     private javax.swing.JPanel panMain;
     private javax.swing.JPanel panQuestion;
     private javax.swing.JPanel panResult;
+    private javax.swing.JProgressBar prbProgress;
     private javax.swing.JRadioButton rbtnSelectA;
     private javax.swing.JRadioButton rbtnSelectB;
     private javax.swing.JTextArea txaStatement;
